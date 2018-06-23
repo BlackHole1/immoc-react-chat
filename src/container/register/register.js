@@ -28,6 +28,9 @@ class Register extends React.Component {
   handleRegister () {
     this.props.register(this.state)
   }
+  toLogin () {
+    this.props.history.push('/login')
+  }
   render () {
     const RadioItem = Radio.RadioItem
     return (
@@ -71,7 +74,14 @@ class Register extends React.Component {
           <Button
             type="primary"
             onClick={this.handleRegister}>
-            注册</Button>
+            注册
+          </Button>
+          <WhiteSpace></WhiteSpace>
+          <Button
+            type="primary"
+            onClick={() => this.toLogin()}>
+            返回登录界面
+          </Button> 
         </WingBlank>
       </div>
     )

@@ -10,6 +10,43 @@ Router.get('/list', function (req, resp) {
   })
 })
 
+Router.post('/login', function (req, resp) {
+  const { user, pwd } = req.body
+  if (!user || !pwd) {
+    return resp.json({
+      code: 0,
+      msg: '用户名密码必须填写'
+    })
+  }
+  
+  User.findOne({
+    user,
+    pwd: md5Pwd(pwd)
+  }, {
+    pwd: 0,
+    __v: 0
+  }, function (err, doc) {
+    if (err) {
+      return resp.json({
+        code: 0,
+        msg: '数据库查询出错'
+      })
+    }
+    
+    if (!doc) {
+      return resp.json({
+        code: 0,
+        msg: '没有此用户，请检查后重新登录'
+      })
+    }
+
+    return resp.json({
+      code: 1,
+      data: doc
+    })
+  })
+})
+
 Router.post('/register', function (req, resp) {
   const { user, pwd, repeatpwd, type } = req.body
 
@@ -68,7 +105,6 @@ Router.get('/info', function (req, resp) {
     code: 0
   })
 })
-
 
 function md5Pwd (pwd) {
   const salt = 'black-hole_1a1a1a~'
