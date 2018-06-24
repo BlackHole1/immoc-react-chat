@@ -4,14 +4,13 @@ import { getRedirectPath } from '../util'
 const LOGINSUCCESS = 'LOOGINSUCCESS'
 const REGISTER_SUCCESS = 'REGISTER_SUCCESS'
 const ERROR_MSG = 'ERROR_MSG'
+const LOAD_DATA = 'LOAD_DATA'
 
 const initState = {
   redirectTo: '',
   isAuth: '',
   msg: '',
   user: '',
-  pwd: '',
-  repeatpwd: '',
   type: ''
 }
 
@@ -39,6 +38,11 @@ export function user (state = initState, action) {
         ...state,
         msg: action.msg,
         isAuth: false
+      }
+    case LOAD_DATA:
+      return {
+        ...state,
+        ...action.payload
       }
     default:
       return state
@@ -86,8 +90,6 @@ export function register ({user, pwd, repeatpwd, type}) {
         if (resp.status === 200 && resp.data.code === 1) {
           dispatch(registerSuccess({
             user,
-            pwd,
-            repeatpwd,
             type
           }))
         } else {
@@ -116,3 +118,10 @@ export function login({user, pwd}) {
       })
   }
 }
+
+export function loadData (userinfo) {
+  return {
+    type: LOAD_DATA,
+    payload: userinfo
+  }
+} 

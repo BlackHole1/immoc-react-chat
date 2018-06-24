@@ -3,6 +3,10 @@ const utils = require('utility')
 const model = require('./model')
 const Router = express.Router()
 const User = model.getModel('user')
+const _filter = {
+  'pwd': 0,
+  '__v': 0
+}
 
 Router.get('/list', function (req, resp) {
   User.find({}, function (err, doc) {
@@ -22,10 +26,7 @@ Router.post('/login', function (req, resp) {
   User.findOne({
     user,
     pwd: md5Pwd(pwd)
-  }, {
-    pwd: 0,
-    __v: 0
-  }, function (err, doc) {
+  }, _filter, function (err, doc) {
     if (err) {
       return resp.json({
         code: 0,
@@ -39,6 +40,8 @@ Router.post('/login', function (req, resp) {
         msg: '没有此用户，请检查后重新登录'
       })
     }
+
+    resp.cookie('userid', doc._id)
 
     return resp.json({
       code: 1,
@@ -81,11 +84,13 @@ Router.post('/register', function (req, resp) {
       })
     }
 
-    User.create({
+    const userModel = new User({
       user,
       pwd: md5Pwd(pwd),
       type
-    }, function (err, doc) {
+    })
+
+    userModel.save(function(err, doc) {
       if (err) {
         return resp.json({
           code: 0,
@@ -93,16 +98,51 @@ Router.post('/register', function (req, resp) {
         })
       }
 
+      const { user, type, _id } = doc
+      resp.cookie('userid', _id)
+
       return resp.json({
-        code: 1
+        code: 1,
+        data: {
+          user,
+          type,
+          _id
+        }
       })
     })
   })
 })
 
 Router.get('/info', function (req, resp) {
-  return resp.json({
-    code: 0
+  const { userid } = req.cookies
+  if (!userid) {
+    return resp.json({
+      code: 0,
+      msg: '请先登录'
+    })
+  }
+  
+  User.findOne({
+    _id: userid
+  }, _filter, function (err, doc) {
+    if (err) {
+      return resp.json({
+        code:0,
+        msg: '数据库查询失败'
+      })
+    }
+    
+    if (!doc) {
+      return resp.json({
+        code: 0,
+        msg: '找不到当前用户，请重新检查cookie'
+      })
+    }
+
+    return resp.json({
+      code: 1,
+      data: doc
+    })
   })
 })
 
