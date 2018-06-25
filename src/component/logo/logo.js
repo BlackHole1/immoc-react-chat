@@ -5,7 +5,7 @@ import './logo.css'
 function Logo () {
   return (
     <div className="logo-container">
-      <img src={logoImg} width='250px' />
+      <img src={logoImg} width='250px' alt='Logo' />
     </div>
   )
 }
