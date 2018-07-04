@@ -113,6 +113,35 @@ Router.post('/register', function (req, resp) {
   })
 })
 
+Router.post('/update', function (req, resp) {
+  const userid = req.cookies.userid
+  if (!userid) {
+    return resp.json({
+      code: 0,
+      msg: 'cookie中没有找到userid字段。请重新登录后再次尝试'
+    })
+  }
+  const body = req.body
+  User.findByIdAndUpdate(userid, body, function (err, doc) {
+    if (err) {
+      return resp.json({
+        code: 0,
+        msg: '数据库查询出错'
+      })
+    }
+
+    const data = Object.assign({}, {
+      user: doc.user,
+      type: doc.type
+    }, body)
+
+    return resp.json({
+      code: 1,
+      data
+    })
+  })
+})
+
 Router.get('/info', function (req, resp) {
   const { userid } = req.cookies
   if (!userid) {

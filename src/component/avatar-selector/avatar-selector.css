@@ -1,0 +1,4 @@
+/* 解决chrome 监听touch类事件报错问题 */
+ul.slider-list {
+  touch-action: none;
+}
